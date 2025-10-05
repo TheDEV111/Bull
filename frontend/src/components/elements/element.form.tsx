@@ -29,6 +29,7 @@ interface FormInputProps extends AllProps {
     defaultValue?: string | number | readonly string[];
     value?: string | number | readonly string[];
     onChange?: React.ChangeEventHandler<HTMLInputElement>;
+    onKeyPress?: React.KeyboardEventHandler<HTMLInputElement>;
     readOnly?: boolean;
 }
 export const FormInput: React.FC<FormInputProps> = ({
@@ -40,6 +41,7 @@ export const FormInput: React.FC<FormInputProps> = ({
     value,
     defaultValue,
     onChange,
+    onKeyPress,
     readOnly,
     ...props
 }) => {
@@ -54,6 +56,7 @@ export const FormInput: React.FC<FormInputProps> = ({
                 name={name}
                 value={!type || type !== "number" ? value || "" : value || 0}
                 onChange={onChange || (() => { })}
+                onKeyPress={onKeyPress}
                 {...(defaultValue ? { defaultValue } : {})}
                 placeholder={placeholder}
                 readOnly={readOnly}

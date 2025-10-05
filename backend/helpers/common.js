@@ -30,7 +30,7 @@ const path = require('path');
 var socket = 0;
 exports.SocketInit = function (socketIO) { socket = socketIO; }
 var client = [];
-let authKey = 'OSgPuToUnMnSHmnIaDLAeaXa';
+let authKey = process.env.JWT_SECRET || 'OSgPuToUnMnSHmnIaDLAeaXa';
 
 exports.getUrl = function () {
   console.log(process.env.NODE_ENV);

@@ -19,7 +19,10 @@ const home = require('./routes/userApi/home');
 const users = require('./routes/userApi/users');
 const history = require('./routes/userApi/history');
 
-// const userHome = require('./routes/basic');
+// Modern authentication routes
+const authRoutes = require('./routes/auth');
+
+const userHome = require('./routes/basic');
 const apiRoute = require('./routes/api_route');
 const limbo = require('./routes/limbo');
 const dice = require('./routes/dice');
@@ -38,6 +41,7 @@ const bustabit = require('./routes/bustabit');
 const plinko = require('./routes/plinko');
 
 const support = require('./routes/support');
+const auth = require('./routes/auth');
 
 var app = express();
 app.use(cors());
@@ -67,15 +71,17 @@ app.set('port', port);
 
 
 // admin panel
-
 app.use('/admin', admin);
 app.use('/cms', cms);
 app.use('/home', home);
 app.use('/users', users);
 app.use('/history', history);
 
+// Modern authentication routes
+app.use('/auth', authRoutes);
+
 // user panel
-// app.use('/basic', userHome);  // Change Binance API 
+app.use('/basic', userHome);  // Change Binance API 
 app.use('/apiRoute', apiRoute);
 app.use('/dice', dice);
 app.use('/coinflip', coinflip);
@@ -95,30 +101,27 @@ app.use('/bustabit', bustabit.router);
 
 
 app.use('/support', support);
+app.use('/auth', auth);
+
+// Modern authentication routes
+app.use('/api/auth', auth);
 
 
 var mongoose = require( 'mongoose' );
-var server;
 
-if(process.env.NODE_ENV == 'production'){
-  // var credentials = {
-  //   key: fs.readFileSync('config/wcx_exchange.key'),
-  //   cert: fs.readFileSync('config/wcx_exchange.crt')
-  // };
-  // var server = https.createServer(credentials, app);
-  // server.listen(port, () => {
-  //   console.log('Checks - HTTPS Server running on port '+port);
-  // });
-  var server = http.createServer(app);
-  server.listen(13578, () => {
-    console.log('Checks - HTTPS Server running on port '+ 13578);
-  });
-} else {
-  var server = http.createServer(app);
-  server.listen(13578, () => {
-    console.log('HTTP Server running on port '+ 13578);
-  });
-}
+// Enhanced database connection
+const dbManager = require('./utils/database');
+dbManager.connect().then(connected => {
+  if (connected) {
+    console.log('🎉 Database ready for production use');
+  } else {
+    console.log('⚠️  Running in offline mode - some features may be limited');
+  }
+}).catch(err => {
+  console.error('Database initialization error:', err);
+});
+
+// Server creation is handled by bin/www, not here
 
 
 app.use(function(req, res, next) {

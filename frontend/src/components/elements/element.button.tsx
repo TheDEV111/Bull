@@ -1,14 +1,20 @@
-import { Div, LinkBase } from "components/base";
+import { Div, LinkBase, Button } from "components/base";
 import { AllProps } from "components/base/interface.base";
-import { MouseEventHandler, useState } from "react";
+import { MouseEventHandler } from "react";
 import styled, { keyframes } from "styled-components";
 import BtnBg from "../../assets/image/btnbg.svg";
 import BtnOverBg from "../../assets/image/overbtnbg.svg";
 
-interface IBtnBase {
+interface IBtnBase extends AllProps {
   disabled?: boolean;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
 }
-const BtnBase = styled(LinkBase) <IBtnBase>`
+
+interface ILinkBtnBase extends AllProps {
+  disabled?: boolean;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
+}
+const BtnBase = styled(Button) <IBtnBase>`
   transition: 300ms;
   opacity: ${(p) => (p.disabled ? "0.5" : "1")};
   pointer-events: ${(p) => (p.disabled ? "none" : "unset")};
@@ -80,7 +86,7 @@ const longClickAnimation = keyframes`
   100% { background-color: #007bff; }
 `;
 
-const HeaderBtnBase = styled(LinkBase) <IBtnBase>`
+const HeaderBtnBase = styled(LinkBase)<ILinkBtnBase>`
   transition: 300ms;
   opacity: ${(p) => (p.disabled ? "0.5" : "1")};
   pointer-events: ${(p) => (p.disabled ? "none" : "unset")};

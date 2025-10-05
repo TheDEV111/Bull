@@ -15,6 +15,8 @@ const common = require('../helpers/common');
 const mail = require('../helpers/mail');
 const game = require('../helpers/game');
 
+// Modern auth middleware
+const auth = require('../middleware/auth');
 
 //schemas
 const users = require('../model/users');
@@ -27,8 +29,8 @@ const gamelist = require('../model/gamelist');
 const profitDb = require('../model/profit');
 
 
-router.post('/getGameResult', common.userVerify, function(req, res) {
-	// need to check user balance.
+router.post('/getGameResult', auth.authenticateUser, function(req, res) {
+	// User is authenticated via middleware, req.user and req.userId are available
 	var userId = mongoose.mongo.ObjectId(req.userId);
 	var currency = req.body.currency;
 	var bet_amount = req.body.bet_amount;

@@ -6,7 +6,7 @@ import LayoutHeader from './layout.header';
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
 
-  if (location.pathname === '/login') {
+  if (location.pathname === '/login' || location.pathname === '/register') {
     return <>{children}</>; // Ensure to return JSX here
   }
 

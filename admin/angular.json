@@ -29,11 +29,11 @@
             ],
             "styles": [
               "src/styles.scss",
-              "node_modules/ngx-toastr/toastr.css",
+              "../node_modules/ngx-toastr/toastr.css",
               "src/assets/patternlock.min.css"
             ],
             "scripts": [
-              "node_modules/jquery/dist/jquery.min.js",
+              "../node_modules/jquery/dist/jquery.min.js",
               "src/assets/patternlock.min.js"
             ]
           },

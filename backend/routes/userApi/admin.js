@@ -1455,4 +1455,151 @@ function uploadcheck(req,callback) {
 		callback(req.body.image);
 	}
 }
+
+// Import new auth middleware
+const auth = require('../../middleware/auth');
+
+// Modern admin login route
+router.post('/auth/login', async (req, res) => {
+	try {
+		const { email, password, pattern } = req.body;
+		
+		// Validate input
+		if (!email || !password || !pattern) {
+			return res.status(400).json({
+				success: false,
+				message: 'Email, password, and pattern are required'
+			});
+		}
+
+		// Get IP and browser info
+		const ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
+		const cleanIP = ip.replace('::ffff:', '');
+		const agent = useragent.parse(req.headers['user-agent']);
+		const os = agent.os.toString().split(' ')[0];
+		const browser = agent.toAgent().split(' ')[0];
+
+		// Check if IP is blocked
+		const blockedIP = await blockip.findOne({ ip_addr: cleanIP });
+		if (blockedIP) {
+			return res.status(403).json({
+				success: false,
+				message: 'Access denied from this IP'
+			});
+		}
+
+		// Find admin
+		const adminData = await admin.findOne({
+			ownermail: email,
+			ownerkey: password,
+			pattern: pattern
+		});
+
+		if (!adminData) {
+			// Log failed attempt
+			const existingAttempt = await loginAttempts.findOne({ ip_address: cleanIP });
+			if (existingAttempt) {
+				await loginAttempts.updateOne(
+					{ _id: existingAttempt._id },
+					{ $inc: { attemptCount: 1 }, status: 0 }
+				);
+			} else {
+				await loginAttempts.create({
+					emailid: email,
+					secret_key: password,
+					ip_address: cleanIP,
+					browser: browser,
+					deviceinfo: os,
+					status: 0
+				});
+			}
+
+			return res.status(401).json({
+				success: false,
+				message: 'Invalid email, password, or pattern'
+			});
+		}
+
+		// Check admin status
+		if (adminData.status !== 1) {
+			return res.status(403).json({
+				success: false,
+				message: 'Admin account is deactivated'
+			});
+		}
+
+		// Log successful login
+		await adminhis.create({
+			adminId: adminData._id,
+			ipaddress: cleanIP,
+			browser: browser,
+			deviceinfo: os,
+			status: 1
+		});
+
+		// Remove any login attempts
+		await loginAttempts.findOneAndRemove({ emailid: adminData.ownermail });
+
+		// Create JWT token
+		const token = auth.createAdminToken(adminData);
+
+		res.json({
+			success: true,
+			token: token,
+			admin: {
+				id: adminData._id,
+				username: adminData.username,
+				email: adminData.ownermail,
+				role: adminData.role,
+				accessModules: adminData.access_module
+			},
+			message: 'Admin login successful'
+		});
+
+	} catch (error) {
+		console.error('Admin login error:', error);
+		res.status(500).json({
+			success: false,
+			message: 'Internal server error'
+		});
+	}
+});
+
+// Get admin profile
+router.get('/auth/profile', auth.authenticateAdmin, (req, res) => {
+	res.json({
+		success: true,
+		admin: {
+			id: req.admin._id,
+			username: req.admin.username,
+			email: req.admin.ownermail,
+			role: req.admin.role,
+			accessModules: req.admin.access_module,
+			profileImg: req.admin.profileimg
+		}
+	});
+});
+
+// Admin logout
+router.post('/auth/logout', auth.authenticateAdmin, (req, res) => {
+	res.json({
+		success: true,
+		message: 'Admin logged out successfully'
+	});
+});
+
+// Validate admin token
+router.get('/auth/validate', auth.authenticateAdmin, (req, res) => {
+	res.json({
+		success: true,
+		valid: true,
+		admin: {
+			id: req.admin._id,
+			username: req.admin.username,
+			role: req.admin.role,
+			type: req.adminToken.type
+		}
+	});
+});
+
 module.exports = router;

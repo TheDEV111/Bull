@@ -4,3 +4,4 @@ logs
 config/development.js
 uploads
 .env
+config/production.js

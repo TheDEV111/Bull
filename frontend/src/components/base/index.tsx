@@ -133,3 +133,17 @@ Flex.defaultProps = {
   display: "flex",
 };
 
+// Button
+export const Button = styled.button<AllProps>`
+  ${allCompose}
+`;
+Button.defaultProps = {
+  boxSizing: "border-box",
+  border: "none",
+  background: "none",
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+

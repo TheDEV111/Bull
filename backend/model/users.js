@@ -54,6 +54,9 @@ let usersSchema = new Schema({
   "liked_game"      : { type: Array},
   "gamecount"       : { type: Array},
   "vip"             : { type: String, default: 'VIP 0'},
+  "wallet_address"  : { type: String, default: '' },
+  "wallet_type"     : { type: String, default: '' }, // 'phantom', 'metamask', etc.
+  "wallet_connected_at" : { type: Date },
 }, {"versionKey" : false});
 
 module.exports = mongoose.model('user_info', usersSchema, 'user_info');

@@ -2,6 +2,7 @@ import { Container, ContainerFluid, Div, Image } from "components/base";
 import { styled } from "styled-components";
 import BannerBg from "../../assets/image/banner.png";
 import { LandingBuyBtn } from "components/elements/element.button";
+import { useNavigate } from "react-router-dom";
 
 const HeaderWrapper = styled(ContainerFluid)``;
 HeaderWrapper.defaultProps = {
@@ -54,6 +55,11 @@ IntroTitle2.defaultProps = {
 
 
 const LandingPageHeader = () => {
+  const navigate = useNavigate();
+
+  const handlePlayNow = () => {
+    navigate('/register');
+  };
 
   return (
     <HeaderWrapper
@@ -64,7 +70,7 @@ const LandingPageHeader = () => {
           <IntroTitle>Hello Bull!<br />Welcome aboard</IntroTitle>
           <IntroTitle1 mt={"5px"}>first deposit bonus</IntroTitle1>
           <IntroTitle2 mt={"5px"}>+300% reward</IntroTitle2>
-          <LandingBuyBtn>PLAY NOW</LandingBuyBtn>
+          <LandingBuyBtn onClick={handlePlayNow}>PLAY NOW</LandingBuyBtn>
         </Container>
       </FilterDiv>
     </HeaderWrapper>
